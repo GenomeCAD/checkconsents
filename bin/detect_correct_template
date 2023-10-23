@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+
+#pip install cdifflib
+import argparse
+import os
+import sys
+import pytesseract
+from PIL import Image
+from difflib import SequenceMatcher
+
+# Open the image file
+page = {
+    "recherche" : "Consentement pour la conservation, dans un but de recherche"
+}
+
+templates = {
+    "tiers_apparente" : "(tiers apparenté)",
+    "foetus": "génétiques d’un foetus décédé réalisé pour une finalité médicale",
+    "mineur_decede": "génétiques d’une personne mineure décédée",
+    "mineur": "génétiques d’une personne mineure réalisé pour une finalité médicale",
+    "majeur_tutelle": "génétiques d’une personne majeure sous tutelle",
+    "majeur" : "génétiques d’une personne majeure réalisé pour une finalité médicale",
+    #"cancer-majeur": "génetiques d’une personne majeure réalisé pour une finalité médicale",
+    #"cancer-mineur": "génétiques d’une personne mineure réalisé pour une finalité médicale",
+    }
+
+def main():
+    
+    ap = argparse.ArgumentParser()
+    ap.add_argument('image', help='Image to analyze')
+    ap.add_argument('output', help='Directory to write output to')
+
+    args = ap.parse_args()
+    #print(f"File location using __file__ variable:{os.path.realpath(os.path.dirname(__file__))}")
+
+    file_name = os.path.basename(args.image)
+    file = os.path.splitext(file_name)
+    filename = file[0]
+    args.output= args.output.rstrip("/")
+    save_space = args.output+"/"+file[0]+".txt"
+    
+    image = Image.open(args.image)
+
+    # Perform OCR using PyTesseract
+    text = pytesseract.image_to_string(image)
+    textfile = open(save_space, "a")
+    textfile.write(text)
+    textfile.close()
+
+    # Print the extracted text
+    lines = text.splitlines()
+   #print (lines) 
+
+
+    found = False
+    found2 = False
+    bestmatch = {}
+
+    for i in range (5):
+        for key in page:
+            similarity_score1=SequenceMatcher(None, lines[i], page[key]).ratio()
+            if similarity_score1 > 0.8:
+                found = True
+                #print (f"The following page is the one to be analysed with a confidence of {similarity_score1:.2f}")
+    if found == True:
+        for i in range (5):
+            for key in templates:
+                similarity_score2=SequenceMatcher(None, lines[i], templates[key]).ratio()
+                if similarity_score2 > 0.90:
+                        ##print (f"The following document is using template {key} with a confidence of {similarity_score2:.2f}")
+                        bestmatch[key] = similarity_score2
+                        found2 = True
+    if found2 == True :
+        #print (bestmatch)
+        best_template=max(bestmatch, key=bestmatch.get)
+        if "tiers_apparente" in bestmatch :
+            best_template="tiers_apparente"
+
+    #if found == False and found2 == False:
+    #    print ("Nothing found on this page")
+    if found == True and found2 == True:
+        print (file_name +"\t"+best_template)
+
+if __name__ == '__main__':
+    sys.exit(main())

@@ -1,0 +1,172 @@
+dirpathin=/Users/dsalgado/Library/Mobile\ Documents/com\~apple\~CloudDocs/Test_consentements/initial_data/
+dirpathout=/Users/dsalgado/Library/Mobile\ Documents/com\~apple\~CloudDocs/Test_consentements/image_data/
+for i in `ls "$dirpathin"`
+do
+filename=$(basename -- "$i")
+echo "Treating : ${filename} \n"
+extension="${filename##*.}"
+filename="${filename%.*}"
+
+echo $filename " || EXT = " $extension
+
+convert -density 300 "${dirpathin}"${i} "${dirpathout}"${filename}.png
+done
+
+_____
+
+dirpathin=/Users/dsalgado/omr_testing/RescueOMR-master/templates/test_300dpi/
+dirpathout=/Users/dsalgado/omr_testing/RescueOMR-master/templates/test_300dpi/png/
+for i in `ls "$dirpathin"`
+do
+filename=$(basename -- "$i")
+echo "Treating : ${filename} \n"
+extension="${filename##*.}"
+filename="${filename%.*}"
+
+echo $filename " || EXT = " $extension
+
+convert -density 300 -colorspace RGB "${dirpathin}"${i} "${dirpathout}"${filename}.png
+done
+______
+
+dirpathin=/Users/dsalgado/omr_testing/RescueOMR-master/initial_data/
+dirpathout=/Users/dsalgado/omr_testing/RescueOMR-master/initial_data/text/
+for i in `ls Consentement_*.pdf`
+do
+filename=$(basename -- "$i")
+echo "Treating : ${filename} \n"
+extension="${filename##*.}"
+filename="${filename%.*}"
+
+echo $filename " || EXT = " $extension
+
+pdftotext -layout "${dirpathin}"${i} "${dirpathout}"${filename}.txt
+done
+______
+
+##OCR Images
+convert *.jpg pictures.pdf
+ocrmypdf pictures.pdf scanned.pdf
+pdftotext -layout scanned.pdf scanned.txt
+wc -w scanned.txt
+
+
+
+
+
+
+
+
+
+
+
+
+
+convert -density 300 -quality 90 -colorspace LinearGray -resize 50% "/Users/dsalgado/Library/Mobile\ Documents/com\~apple\~CloudDocs/Test_consentements\Consentement_vide.pdf" /Users/dsalgado/Library/Mobile\ Documents/com\~apple\~CloudDocs/Test_consentements/image_data/Consentement_vide.png
+
+
+
+
+rm files2process.txt; for i in `ls image_data/*.png`
+do ./bin/detect_correct_template ${i} /Users/dsalgado/omr_testing/RescueOMR-master/temp/ >>files2process.txt
+done
+
+
+
+
+
+dirpathin=/Users/dsalgado/omr_testing/RescueOMR-master/cropped/
+for page in `ls "$dirpathin"*-3_cropped.png`
+do
+  filename=$(basename -- "$page")
+  echo "Treating : ${filename} \n"
+  cd /Users/dsalgado/omr_testing/RescueOMR-master
+  ./bin/simpleomr -d debug.png checkboxes.svg ${page}
+done
+______________________________________________________________
+## Pour les templates
+
+dirpathin=/Users/dsalgado/omr_testing/RescueOMR-master/templates/test_300dpi/png/clean/
+for page in `ls "$dirpathin"*-3.png`
+do
+  filename=$(basename -- "$page")
+  echo "Treating : ${filename} \n"
+  ./bin/detectboxes ${page} /Users/dsalgado/omr_testing/RescueOMR-master/all_templates/cropped
+done
+
+====> all cropped templates are in /Users/dsalgado/omr_testing/RescueOMR-master/all_templates/cropped
+______________________________________________________________
+
+dirpathin=/Users/dsalgado/omr_testing/RescueOMR-master/image_data/
+dirpathcropped=/Users/dsalgado/omr_testing/RescueOMR-master/cropped/
+
+while read -r a b
+do 
+echo "filename=$a template=$b"
+filename=$(basename -- "$a")
+extension="${filename##*.}"
+filename="${filename%.*}"
+
+ ./bin/detectboxes ${dirpathin}${a} ${dirpathcropped}
+
+done < files2process.txt
+_______________________________________________________________
+
+
+dirpathin=/Users/dsalgado/omr_testing/RescueOMR-master/cropped/
+dirpathtemplate=/Users/dsalgado/omr_testing/RescueOMR-master/all_templates/
+dirpathdebug=/Users/dsalgado/omr_testing/RescueOMR-master/debug_latest/
+while read -r a b
+do 
+echo "filename=$a template=$b"
+filename=$(basename -- "$a")
+extension="${filename##*.}"
+filename="${filename%.*}"
+
+./bin/simpleomr -d ${dirpathdebug}${filename}.png ${dirpathtemplate}${b}.svg ${dirpathin}${filename}_cropped.png
+
+done < files2process.txt
+_________________________________________
+
+
+
+dirpathin=/Users/dsalgado/omr_testing/RescueOMR-master/image_data/
+for page in `ls "$dirpathin"*-3.png`
+do
+  filename=$(basename -- "$page")
+  echo "Treating : ${filename} \n"
+  ./bin/detectboxes ${page} /Users/dsalgado/omr_testing/RescueOMR-master/cropped
+done
+
+
+dirpathin=/Users/dsalgado/omr_testing/RescueOMR-master/cropped/
+for page in `ls "$dirpathin"*-3_cropped.png`
+do
+  filename=$(basename -- "$page")
+  echo "Treating : ${filename} \n"
+  cd /Users/dsalgado/omr_testing/RescueOMR-master
+  ./bin/simpleomr -d debug.png checkboxes.svg ${page}
+done
+
+
+
+dirpathin=/Users/dsalgado/omr_testing/RescueOMR-master/cropped/
+for page in `ls "$dirpathin"*-3_cropped.png`
+do
+  filename=$(basename -- "$page")
+  echo "Treating : ${filename} \n"
+  /Users/dsalgado/omr_testing/RescueOMR-master/bin/simpleomr -d debug_${filename}.png /Users/dsalgado/omr_testing/RescueOMR-master/checkboxes.svg ${page}
+done
+
+
+
+for page in /Users/dsalgado/omr_testing/RescueOMR-master/image_data/*-3.png
+do
+  # find the template in the page
+  ./bin/extractmpl template.png $page registered.png
+  if [ $? == 0 ]
+  then
+    # template found, extract checkbox values
+    ./bin/simpleomr checkboxes.svg registered.png > $page.txt
+  fi
+done

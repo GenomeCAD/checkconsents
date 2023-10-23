@@ -1,0 +1,4 @@
+1. conversion des pdf en png
+2. detection de l'orientation des pages
+3. detection de la zone globale du texte -> detectboxes
+4. comparaison des pngs avec le template adequat -> simpleomr
