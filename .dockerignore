@@ -1,0 +1,5 @@
+tests/
+env/
+resources/templates/
+resources/all_templates/
+target/

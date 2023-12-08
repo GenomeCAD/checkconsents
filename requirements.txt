@@ -1,0 +1,15 @@
+schema>=0.7.5
+PyYAML>=6.0.1
+pydantic>=2.4
+jsonschema>=4.19.1
+prettyprinter>=0.18.0
+
+pytesseract>=0.3.10
+imutils>=0.5.4
+opencv-python>=4.8.1.78
+
+cdifflib>=1.2.6
+scipy>=1.11.3
+lxml>=4.9.3 
+#scikit-image
+Deprecated>=1.2.14
