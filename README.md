@@ -1,79 +1,226 @@
-# checkconsents
-
-
-
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.com/pfmg-cad/poc/checkconsents.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.com/pfmg-cad/poc/checkconsents/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+# CheckConsents Tool
 
 ## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+
+`CheckConsents` tool requires Python 3.12+.
+
+`CheckConsents` tool requires `convert` from [ImageMagick software](https://imagemagick.org/index.php).
+
+```bash
+$ convert --version
+Version: ImageMagick 7.1.1-15 Q16-HDRI x86_64 21298 https://imagemagick.org
+Copyright: (C) 1999 ImageMagick Studio LLC
+License: https://imagemagick.org/script/license.php
+Features: Cipher DPC HDRI Modules OpenMP(4.5) 
+Delegates (built-in): bzlib cairo djvu fftw fontconfig freetype gslib gvc heic jbig jng jp2 jpeg jxl lcms lqr ltdl lzma openexr pangocairo png ps raqm raw rsvg tiff webp wmf x xml zip zlib
+Compiler: gcc (13.2)
+```
+
+CheckConsents tool use `Tesseract` to detect orientation of pages.
+
+To work, it requires to have `osd.traineddata` file available in `resources` folder.
+You can download it at: https://github.com/tesseract-ocr/tessdata/raw/3.04.00/osd.traineddata
+
+You may need to set TESSDATA_PREFIX env var.
+
+```bash
+export TESSDATA_PREFIX="/path/to/folder/which/contains/traineddata_files"
+```
 
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+```bash
+$ ./checkconsents.py  --help
+usage: checkconsents.py [-h] [-v] -i INPUT_FOLDER [-w WORKING_DIR]
+                        [--configfile CONFIGFILE]
+                        [--log_level {ERROR,error,WARNING,warning,INFO,info,DEBUG,debug}]
+                        [--log_file LOG_FILE]
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+Check consent checkboxes into consent forms (pdf format)
+
+options:
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+
+Inputs:
+  -i INPUT_FOLDER, --input_folder INPUT_FOLDER
+                        path of input directory (default: None)
+  -w WORKING_DIR, --working_dir WORKING_DIR
+                        Directory use to generate intermediates (default:
+                        /tmp)
+
+Config:
+  --configfile CONFIGFILE
+                        configfile filepath (default:
+                        ./checkconsents_config.yml)
+
+Logger:
+  --log_level {ERROR,error,WARNING,warning,INFO,info,DEBUG,debug}
+                        log level (default: INFO)
+  --log_file LOG_FILE   log file (use the stderr by default) (default: None)
+```
+
+```bash
+$ mkdir target
+$ ./checkconsents.py  --input_folder ./tests/resources/initial_data --configfile resources/checkconsents_config.yml -w ./target
+```
+
+```bash
+$ docker run --rm \
+             -v ./target:/code/target  \
+             -v ./resources:/code/resources  \
+             -v ./tests/resources:/code/tests/resources cad/checkconsents:1.0.0 \
+                                                        --input_folder ./tests/resources/initial_data  \
+                                                        --configfile resources/checkconsents_config.yml  \
+                                                        -w /code/target
+
+```
+
+### Outputs
+
+`CheckConsents` tool creates an output folder (like `CheckConsents_20231102-141811`) into the working directory.
+Inside this directory, `CheckConsents` tool generates a json file with all results.
+If some forms have not been resolved a debugging image is generated for an human review. In this specific case, `CheckConsents` exits with code = 3.
+
+The debug level, enabled by adding `--log_level debug` to the command line, increases the verbosity of logs and generates by default all final debugging images.
+
+### Config file
+
+You can use the config file is to define all templates to use and adding/change value for some parameters.
+
+You have an example here: [resources/checkconsents_config.yml] (resources/checkconsents_config.yml).
+
+|var|description|default value|
+|---|-----------|-------------|
+|intermediates|keep intermediate files|False|
+|parsing_header_limit|max of lines read (correspond to the max size of title). Must be an integer greater than 0.|5|
+|conversion:<br>  density: 300<br>  opt_args: "..."|Define specific parameter for pdf conversion to png|density = 300<br>opt_args=None|
+|templates: <br>  mytemplatename:<br>    pattern: "sentence you want to catch"<br>    path: path/to/your/template.svg<br>    priority: <integer greater than 0> | Dict to describe all your templates|None|
+|pages:<br>  recherche: | describe the patterns to identify the right page to analyse|None
+
+### Exit codes
+
+|code|description|
+|----|-----------|
+|0|Success|
+|1|input directory does not exist|
+|2|error during pdf conversion to png|
+|3|Some form can be resolved. See logs for further details|
+
+
+## Developement 
+
+### Setup env
+
+```bash
+$ python -m venv env
+$ source env/bin/activate
+(env) $ pip install -r requirements.txt
+
+```
+
+(optional PyBuilder to manage project)
+```bash
+(env) $ pip install pyb
+```
+
+### Build docker image
+
+We define a dockerfile to setup the perfect environment for `CheckConsents` tool without installing any dependencies on your machine.
+This image is not production ready. We recommand to use it only for dev and testing purpose.
+
+```bash
+$ docker build -t cad/checkconsents:1.0.0 .
+```
+
+```bash
+$ docker run --rm cad/checkconsents:1.0.0
+usage: checkconsents.py [-h] [-v] -i INPUT_FOLDER [-w WORKING_DIR]
+                        [--configfile CONFIGFILE]
+                        [--log_level {ERROR,error,WARNING,warning,INFO,info,DEBUG,debug}]
+                        [--log_file LOG_FILE]
+
+Check consent checkboxes into consent forms (pdf format)
+
+options:
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+
+Inputs:
+  -i INPUT_FOLDER, --input_folder INPUT_FOLDER
+                        path of input directory (default: None)
+  -w WORKING_DIR, --working_dir WORKING_DIR
+                        Directory use to generate intermediates (default:
+                        /tmp)
+
+Config:
+  --configfile CONFIGFILE
+                        configfile filepath (default:
+                        /code/checkconsents_config.yml)
+
+Logger:
+  --log_level {ERROR,error,WARNING,warning,INFO,info,DEBUG,debug}
+                        log level (default: INFO)
+  --log_file LOG_FILE   log file (use the stderr by default) (default: None)
+```
+
+### Tests
+
+Using local virtualenv:
+
+```bash
+(env) $ python checkconsents.py --input_folder ./tests/resources --configfile resources/checkconsents_config.yml --log_level debug -w ./target
+
+(env) $ python -m pdb checkconsents.py --input_folder ./tests/resources --configfile resources/checkconsents_config.yml --log_level debug -w ./target
+```
+
+Analyse all example files from `tests/resources/initial_data` :
+
+```bash
+$ mkdir target
+$ docker run --rm \
+             -v /etc/localtime:/etc/localtime:ro \
+             -v ./target:/code/target \
+             -v ./resources:/code/resources \
+             -v ./tests/resources:/code/tests/resources \
+             cad/checkconsents:1.0.0 \
+                      --input_folder ./tests/resources/initial_data \
+                      --configfile resources/checkconsents_config.yml \
+                      --working_dir /code/target
+
+# NB if you have timezone setted on your host add the followwing docker option : -v /etc/timezone:/etc/timezone:ro 
+```
+
+
+#### Debugging using docker image:
+
+```bash
+$ docker build -t cad/checkconsents:test .
+
+$ docker run --rm \
+             -v ./target:/code/target \
+             -v ./checkconsents.py:/code/checkconsents.py \
+             -v ./resources:/code/resources \
+             -v ./tests/resources:/code/tests/resources cad/checkconsents:test \
+                --input_folder ./tests/resources \
+                --configfile resources/checkconsents_config.yml \
+                --log_level debug \
+                -w /code/target
+
+# debug
+$ docker run --rm -it --entrypoint python \
+             -v ./target:/code/target \
+             -v ./checkconsents.py:/code/checkconsents.py \
+             -v ./resources:/code/resources \
+             -v ./tests/resources:/code/tests/resources cad/checkconsents:test \
+                -m pdb /code/checkconsents.py \
+                --input_folder ./tests/resources \
+                --configfile resources/checkconsents_config.yml \
+                --log_level debug \
+                -w /code/target
+
+```
+
 
 ## Contributing
 State if you are open to contributions and what your requirements are for accepting them.

@@ -1,0 +1,42 @@
+---
+intermediates: False
+#parsing_header_limit: 5                                        # max of lines read (correspond to the max size of title) (default 5)
+
+conversion:
+  density: 300                                               # optional (default 300)
+  #opt_args: -quality 90 -colorspace LinearGray -resize 50%   # optional (default None)
+  opt_args: -type bilevel
+
+templates:
+  majeur:
+    pattern: "génétiques d’une personne majeure réalisé pour une finalité médicale"
+    path: resources/all_templates/majeur.svg
+    priority: 1
+
+  majeur_tutelle:
+    pattern: "génétiques d’une personne majeure sous tutelle"
+    path: resources/all_templates/majeur_tutelle.svg
+    priority: 1
+
+  mineur:
+    pattern: "génétiques d’une personne mineure réalisé pour une finalité médicale"
+    path: resources/all_templates/mineur.svg
+    priority: 1
+
+  mineur_decede:
+    pattern: "génétiques d’une personne mineure décédée"
+    path: resources/all_templates/mineur_decede.svg
+    priority: 1
+
+  foetus:
+    pattern: "génétiques d’un foetus décédé réalisé pour une finalité médicale"
+    path: resources/all_templates/foetus.svg
+    priority: 1
+  
+  tiers_apparente:
+    pattern: "(tiers apparenté)"
+    path: resources/all_templates/tiers_apparente.svg
+    priority: 10                                               # required to consider the right template in this case
+
+pages:
+  recherche: "Consentement pour la conservation, dans un but de recherche"
