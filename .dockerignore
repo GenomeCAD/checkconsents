@@ -1,5 +1,18 @@
-tests/
+# virtualenv
 env/
+consentforms/env_doc
+
+# dev resources
 resources/templates/
 resources/all_templates/
+
+# tests
 target/
+tests/
+consentforms/test
+
+# pytest, cov, html
+assets/
+htmlcov/
+.coverage
+report.html

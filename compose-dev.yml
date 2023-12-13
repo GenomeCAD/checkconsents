@@ -1,0 +1,16 @@
+---
+version: "3"
+services:
+  app:
+    image: cad/chekcconsents-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DOCKER_REQUIREMENTS: requirements-dev.txt
+    env_file:
+      - .env
+    volumes:
+      - .:/code
+      - ./target:/tmp/pytest-of-cad
+    entrypoint: sleep infinity
