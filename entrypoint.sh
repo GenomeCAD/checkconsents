@@ -3,4 +3,4 @@
 # echo "TESSDATA_PREFIX=$TESSDATA_PREFIX"
 #export TESSDATA_PREFIX=/code/resources
 
-/code/checkconsents.py $@
+/code/consentforms/checkconsents.py $@

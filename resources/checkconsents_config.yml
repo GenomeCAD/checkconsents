@@ -3,7 +3,7 @@ intermediates: False
 #parsing_header_limit: 5                                        # max of lines read (correspond to the max size of title) (default 5)
 
 conversion:
-  density: 300                                               # optional (default 300)
+  #density: 300                                               # optional (default 300)
   #opt_args: -quality 90 -colorspace LinearGray -resize 50%   # optional (default None)
   opt_args: -type bilevel
 
