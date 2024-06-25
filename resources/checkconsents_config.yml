@@ -5,7 +5,7 @@ intermediates: False
 conversion:
   #density: 300                                               # optional (default 300)
   #opt_args: -quality 90 -colorspace LinearGray -resize 50%   # optional (default None)
-  opt_args: -type bilevel
+  #opt_args: -type bilevel
 
 templates:
   majeur:

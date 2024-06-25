@@ -41,7 +41,7 @@ def test_rotate_image():
 
 def test_convert_2_gray_scale():
     img = i.image_2_mat(IMG_FILEPATH)
-    assert i.convert_2_gray_scale(img) == cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    assert numpy.array_equal(i.convert_2_gray_scale(img), cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))
 
 
 def test_generate_crop_image(tmp_path, rotate_img_files):

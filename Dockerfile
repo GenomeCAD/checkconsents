@@ -8,7 +8,7 @@ LABEL base.image="python:3.12.0-slim"
 LABEL version="1.0.0"
 LABEL software="checkconsents"
 LABEL software.version="1.0.0"
-LABEL license="GLP 3"
+LABEL license="AGLP 3"
 LABEL about.tags="OMR"
 
 RUN /bin/sh -c 'set e  ; \

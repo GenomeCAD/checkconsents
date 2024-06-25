@@ -4,7 +4,7 @@
 
 __authors__ = ("David Salgado", "Adrien Josso Rigonato")
 __contact__ = ("david.salgado@genomecad.fr", "adrien.josso-rigonato@genomecad.fr")
-__copyright__ = "GLP3"
+__copyright__ = "GNU AGLP3"
 __version__ = "1.0.0"
 
 
@@ -88,12 +88,12 @@ def convert_2_gray_scale(img: cv2.Mat) -> cv2.Mat:
 
 def delimit_area(img: cv2.Mat):
     gray = convert_2_gray_scale(img)
-    # blur = cv2.GaussianBlur(gray, (9, 9), 0)
-    blur = cv2.GaussianBlur(gray, (21, 21), 0)
-    thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-    # thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 30)
-    # kernal = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 9)) #3,13
-    kernal = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 13))
+    blur = cv2.GaussianBlur(gray, (9, 9), 0)
+    # blur = cv2.GaussianBlur(gray, (21, 21), 0) #Initial values
+    # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1] #Initial values
+    thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 30)
+    kernal = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 9))  # 3, 13
+    # kernal = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 13)) #Initial values
     dilate = cv2.dilate(thresh, kernal, iterations=1)
     cnts = cv2.findContours(dilate, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     cnts = cnts[0] if len(cnts) == 2 else cnts[1]
