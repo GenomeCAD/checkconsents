@@ -2,7 +2,7 @@
 
 __authors__ = ("David Salgado", "Adrien Josso Rigonato")
 __contact__ = ("david.salgado@genomecad.fr", "adrien.josso-rigonato@genomecad.fr")
-__copyright__ = "GLP3"
+__copyright__ = "GNU AGLP3"
 __version__ = "1.0.0"
 __prog_name__ = "CheckConsents"
 
@@ -84,11 +84,6 @@ def arguments_parser():
                                   help='log file (use the stderr by default)',
                                   required=False)
     return parser
-
-
-# class PdfConvertError(Exception):
-#     def __init__(self, message: str):
-#         super().__init__(message)
 
 
 class OmrError(Exception):
@@ -221,23 +216,6 @@ def cleaning(fpath,
     else:
         logger.debug("{} does not exist. Nothing to do".format(fpath))
         return False
-
-
-# def convert_pdf_2_png(pdf_filepath: FilePath,
-#                       png_filepath: FilePath,
-#                       density: int = 300,
-#                       optional_args: str = None):
-#     tool = "convert"
-#     cmd_args = f"-density {density} {pdf_filepath.resolve()} {png_filepath.resolve()}"
-#     cmd = [tool, cmd_args]
-#     if optional_args is not None:
-#         cmd.insert(1, optional_args)
-#     exit_code = system(' '.join(cmd))
-#     if exit_code != 0:
-#         raise PdfConvertError(f"Conversion of {pdf_filepath.resolve} failed")
-#     return exit_code
-#     # stream = os.popen(f"convert -density {density} {pdf_filepath.resolve()} {png_filepath.resolve()}")
-#     # return stream.read()
 
 
 def image_correction(png_filepath: FilePath) -> FilePath:

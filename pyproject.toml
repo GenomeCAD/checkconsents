@@ -31,12 +31,12 @@ dependencies = [ #TODO define this section
     "lxml >=4.9.3",
 ]
 
-[project.optional-dependencies] #TODO define this section
+[project.optional-dependencies]
 test = [
     "pytest >=7.4.3",
     "pytest-cov",
+    "pytest-html",
 ]
-doc = ["sphinx"]
 
 [project.urls] #TODO define this section
 Home = "https://github.com/"

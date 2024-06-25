@@ -4,7 +4,7 @@ Detect template of image
 
 __authors__ = ("David Salgado", "Adrien Josso Rigonato")
 __contact__ = ("david.salgado@genomecad.fr", "adrien.josso-rigonato@genomecad.fr")
-__copyright__ = "GLP3"
+__copyright__ = "GNU AGLP3"
 __version__ = "1.0.0"
 
 
