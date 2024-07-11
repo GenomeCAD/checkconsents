@@ -1,12 +1,14 @@
 # CheckConsents Tool
 
+## Description
+
 ## Installation
 
 `CheckConsents` tool requires Python 3.12+.
 
 `CheckConsents` tool requires `convert` from [ImageMagick software](https://imagemagick.org/index.php).
 
-```bash
+```Bash
 $ convert --version
 Version: ImageMagick 7.1.1-15 Q16-HDRI x86_64 21298 https://imagemagick.org
 Copyright: (C) 1999 ImageMagick Studio LLC
@@ -23,13 +25,69 @@ You can download it at: https://github.com/tesseract-ocr/tessdata/raw/3.04.00/os
 
 You may need to set TESSDATA_PREFIX env var.
 
-```bash
+```Bash
 export TESSDATA_PREFIX="/path/to/folder/which/contains/traineddata_files"
 ```
 
+It is easier to use container, see [Docker section](#docker).
+
+## Docker
+
+A development image can be built from the available `Dockerfile`.
+This image is base on `python:3.12-slim` image.
+
+### Build docker image
+
+We define a dockerfile to set up the perfect environment for `CheckConsents` tool without installing any dependencies on your machine.
+This image is not production ready. We recommend to use it only for dev and testing purpose.
+
+```Bash
+$ docker build -t cad/checkconsents:1.0.0 .
+```
+
+```Bash
+$ docker run --rm cad/checkconsents:1.0.0
+usage: checkconsents.py [-h] [-v] -i INPUT_FOLDER [-w WORKING_DIR]
+                        [--configfile CONFIGFILE]
+                        [--log_level {ERROR,error,WARNING,warning,INFO,info,DEBUG,debug}]
+                        [--log_file LOG_FILE]
+
+Check consent checkboxes into consent forms (pdf format)
+
+options:
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+
+Inputs:
+  -i INPUT_FOLDER, --input_folder INPUT_FOLDER
+                        path of input directory (default: None)
+  -w WORKING_DIR, --working_dir WORKING_DIR
+                        Directory use to generate intermediates (default:
+                        /tmp)
+
+Config:
+  --configfile CONFIGFILE
+                        configfile filepath (default:
+                        /code/consentforms/checkconsents_config.yml)
+
+Logger:
+  --log_level {ERROR,error,WARNING,warning,INFO,info,DEBUG,debug}
+                        log level (default: INFO)
+  --log_file LOG_FILE   log file (use the stderr by default) (default: None)
+```
+
+### Known vulnerabilities
+
+[Vulnerabilities scan of docker image](docs/docker-image-vulnerabilities.md)
+
+### Software Bill of Materials (SBOM)
+
+[SBOM description of docker image](docs/docker-image-sbom.md)
+
+
 ## Usage
 
-```bash
+```Bash
 $ ./consentforms/checkconsents.py  --help
 usage: checkconsents.py [-h] [-v] -i INPUT_FOLDER [-w WORKING_DIR]
                         [--configfile CONFIGFILE]
@@ -60,12 +118,12 @@ Logger:
   --log_file LOG_FILE   log file (use the stderr by default) (default: None)
 ```
 
-```bash
+```Bash
 $ mkdir target
 $ ./consentforms/checkconsents.py  --input_folder ./tests/resources/initial_data --configfile resources/checkconsents_config.yml -w ./target
 ```
 
-```bash
+```Bash
 $ docker run --rm \
              -v /etc/localtime:/etc/localtime:ro \
              -v ./target:/code/target  \
@@ -154,58 +212,7 @@ These predictions were obtained using default CheckConsents parameters for conve
 > Modification of curent values of CheckConsents parameters may decrease file size of png and therefore increase execution time but may also impact accuracy of the detection. 
 
 
-## Docker
 
-A development image can be built from the available `Dockerfile`.
-This image is base on `python:3.12-slim` image.
-
-### Build docker image
-
-We define a dockerfile to set up the perfect environment for `CheckConsents` tool without installing any dependencies on your machine.
-This image is not production ready. We recommend to use it only for dev and testing purpose.
-
-```bash
-$ docker build -t cad/checkconsents:1.0.0 .
-```
-
-```bash
-$ docker run --rm cad/checkconsents:1.0.0
-usage: checkconsents.py [-h] [-v] -i INPUT_FOLDER [-w WORKING_DIR]
-                        [--configfile CONFIGFILE]
-                        [--log_level {ERROR,error,WARNING,warning,INFO,info,DEBUG,debug}]
-                        [--log_file LOG_FILE]
-
-Check consent checkboxes into consent forms (pdf format)
-
-options:
-  -h, --help            show this help message and exit
-  -v, --version         show program's version number and exit
-
-Inputs:
-  -i INPUT_FOLDER, --input_folder INPUT_FOLDER
-                        path of input directory (default: None)
-  -w WORKING_DIR, --working_dir WORKING_DIR
-                        Directory use to generate intermediates (default:
-                        /tmp)
-
-Config:
-  --configfile CONFIGFILE
-                        configfile filepath (default:
-                        /code/consentforms/checkconsents_config.yml)
-
-Logger:
-  --log_level {ERROR,error,WARNING,warning,INFO,info,DEBUG,debug}
-                        log level (default: INFO)
-  --log_file LOG_FILE   log file (use the stderr by default) (default: None)
-```
-
-### Known vulnerabilities
-
-[Vulnerabilities scan of docker image](docs/docker-image-vulnerabilities.md)
-
-### Software Bill of Materials (SBOM)
-
-[SBOM description of docker image](docs/docker-image-sbom.md)
 
 ## Development 
 
@@ -214,7 +221,7 @@ We recommend to use docker which makes easier the management of environment.
 
 ### Setup virtualenv
 
-```bash
+```Bash
 $ python -m venv env
 $ source env/bin/activate
 (env) $ pip install -r requirements.txt
@@ -225,10 +232,12 @@ $ source env/bin/activate
 It requires Docker and Docker Compose installed. 
 All folders and files form the repository are available into `/code` directory.
 
-```bash
+```Bash
+$ mkdir target                                        # temp folder for unit test
+$ touch .env
 $ docker compose -f compose-dev.yml up -d
 $ docker compose -f compose-dev.yml ps
-$ docker exec -it checkconsents-app-1 /bin/bash 
+$ docker exec -it checkconsents-app-1 /bin/bash
 cad@853796383c04:/code$ source dev.docker.bashrc      # load aliases (optional but recommended)
 [cad@docker-853796383c04 /code] [07.11.2023 09:25:52] $
 ```
