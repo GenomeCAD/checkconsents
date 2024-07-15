@@ -295,9 +295,9 @@ Generate a test report (`report.html`, `.coverage`, `htmlcov/index.html`) (in de
 Using local virtualenv:
 
 ```bash
-(env) $ python checkconsents.py --input_folder ./tests/resources --configfile resources/checkconsents_config.yml --log_level debug -w ./target
+(env) $ python consentforms/checkconsents.py --input_folder ./tests/resources --configfile resources/checkconsents_config.yml --log_level debug -w ./target
 
-(env) $ python -m pdb checkconsents.py --input_folder ./tests/resources --configfile resources/checkconsents_config.yml --log_level debug -w ./target
+(env) $ python -m pdb consentforms/checkconsents.py --input_folder ./tests/resources --configfile resources/checkconsents_config.yml --log_level debug -w ./target
 ```
 
 Analyse all example files from `tests/resources/initial_data` :
