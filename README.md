@@ -207,14 +207,22 @@ You have an example here: [resources/checkconsents_config.yml] (resources/checkc
 
 These predictions were obtained using default CheckConsents parameters for conversion of pdf into png with a **density of 300 dpi**, and **no colorscale transformation**.
 
-
 > [!note]
 > Modification of curent values of CheckConsents parameters may decrease file size of png and therefore increase execution time but may also impact accuracy of the detection. 
 
+## Parsing the output of CheckConsents tool
 
+The json output from checkconsents could be parsed to generate other formats or combined with other informations.
 
+There is an example of parser which generate a csv file from the `consents.json` file.
 
-## Development 
+It creates a table with the following header:
+
+```Text
+"Input directory","Input filename","Result of the automatic detection","Debug image filename","Output directory"
+```
+
+## Development
 
 You can use virtualenv locally or use the docker compose file: `compose-dev.yml`.
 We recommend to use docker which makes easier the management of environment.
