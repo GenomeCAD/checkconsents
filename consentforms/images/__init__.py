@@ -96,7 +96,7 @@ def delimit_area(img: cv2.Mat):
     contours,hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
     return contours
 
-def crop_image(img: cv2.Mat, cnts) -> cv2.Mat:
+def crop_image(img: cv2.Mat, contours) -> cv2.Mat:
     minx = 100000000
     miny = 100000000
     maxwidth = 0
