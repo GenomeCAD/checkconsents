@@ -5,7 +5,7 @@
 __authors__ = ("David Salgado", "Adrien Josso Rigonato")
 __contact__ = ("david.salgado@genomecad.fr", "adrien.josso-rigonato@genomecad.fr")
 __copyright__ = "GNU AGLP3"
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 
 import cv2
@@ -83,48 +83,45 @@ def rotate_image(img: cv2.Mat, rotation_angle: int, out_filepath: str) -> Mat | 
 
 
 def convert_2_gray_scale(img: cv2.Mat) -> cv2.Mat:
-    return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
+    img = cv2.resize(img, (2480,3508), interpolation= cv2.INTER_LINEAR)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    return img
 
 def delimit_area(img: cv2.Mat):
     gray = convert_2_gray_scale(img)
-    blur = cv2.GaussianBlur(gray, (9, 9), 0)
-    # blur = cv2.GaussianBlur(gray, (21, 21), 0) #Initial values
-    # thresh = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1] #Initial values
-    thresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 30)
-    kernal = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 9))  # 3, 13
-    # kernal = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 13)) #Initial values
-    dilate = cv2.dilate(thresh, kernal, iterations=1)
-    cnts = cv2.findContours(dilate, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    cnts = cnts[0] if len(cnts) == 2 else cnts[1]
-    cnts = sorted(cnts, key=lambda x: cv2.boundingRect(x)[0])
-    return cnts
-
+    gray = cv2.medianBlur(gray,5)
+    thresh = cv2.adaptiveThreshold(gray, 255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, 31, 20)
+    thresh = cv2.dilate(thresh,None,iterations = 10)
+    thresh = cv2.erode(thresh,None,iterations = 10)
+    contours,hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+    return contours
 
 def crop_image(img: cv2.Mat, cnts) -> cv2.Mat:
     minx = 100000000
     miny = 100000000
-    maxx = 0
-    maxy = 0
+    maxwidth = 0
+    maxhigh = 0
     overall_width = 0
     overall_height = 0
     boxx = boxy = 0
-    for c in cnts:
-        x, y, w, h = cv2.boundingRect(c)
-        if x < minx:
-            minx = x
-        if y < miny:
-            miny = y
-        if x > maxx:
-            maxx = x
-            boxx = x + w
-        if y > maxy:
-            maxy = y
-            boxy = h
-        if w > overall_width:
-            overall_width = w
-    logging.debug(f"{miny}:{maxy + boxy}, {minx}:{minx + overall_width}")
-    return img[miny:maxy + boxy, minx:minx + overall_width]
+    maxwidth = 0
+    maxhigh = 0
+    for cnt in contours:
+        x,y,w,h = cv2.boundingRect(cnt)
+        if (w>100 and h>20):
+            if (x < minx ):
+                minx = x
+            if (y < miny ):
+                miny = y
+            if w > maxwidth :
+                maxwidth = w
+                boxx=minx+maxwidth
+            if y > maxhigh :
+                maxhigh = y +h
+                boxy = miny+maxhigh
+            if w > overall_width:
+                overall_width = w
+    return img[miny:maxhigh, minx:boxx]
 
 
 def generate_crop_image(img: cv2.Mat, out_filepath: str) -> bool:
