@@ -40,7 +40,7 @@ def test_rotate_image():
 
 
 def test_convert_2_gray_scale():
-    img = i.image_2_mat(IMG_FILEPATH)
+    img = cv2.resize(i.image_2_mat(IMG_FILEPATH), (2480,3508), interpolation= cv2.INTER_LINEAR)
     assert numpy.array_equal(i.convert_2_gray_scale(img), cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))
 
 
