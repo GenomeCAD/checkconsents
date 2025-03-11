@@ -298,6 +298,8 @@ Generate a test report (`report.html`, `.coverage`, `htmlcov/index.html`) (in de
 [cad@docker-853796383c04 /code] [30.11.2023 14:53:29] $ pytest --html=report.html --cov=consentforms --cov-report html
 ```
 
+> **NB**: the test `tests/test_images.py::test_sort_cnts_without_changing_crop_image` FAILED due to the last changes on version `1.1.0`.
+
 #### Running functional Tests
 
 Using local virtualenv:
@@ -324,7 +326,6 @@ $ docker run --rm \
 
 # NB if you have timezone set on your host add the following docker option : -v /etc/timezone:/etc/timezone:ro 
 ```
-
 
 #### Debugging using docker image:
 
