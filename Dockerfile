@@ -3,8 +3,8 @@ FROM python:3.12-slim
 ARG DOCKER_REQUIREMENTS=requirements.txt
 
 ####### METADATA #######
-LABEL authors="Adrien Josso Rigonato <adrien.josso-rigonato@genomecad.fr>, David Salgado <david.salgado@genomecad.fr>"
-LABEL base.image="python:3.12.0-slim"
+LABEL authors="Adrien Josso Rigonato <adrien.josso-rigonato@genomecad.fr>, David Salgado <david.salgado@inserm.fr>"
+LABEL base.image="python:3.12-slim"
 LABEL version="1.1.0"
 LABEL software="checkconsents"
 LABEL software.version="1.1.0"

@@ -361,12 +361,11 @@ $ docker run --rm -it --entrypoint python \
 
 ## Authors
 
-CheckConsents project is developed by David Salgado <david.salgado@genomecad.fr> 
+CheckConsents project is developed by David Salgado <david.salgado@inserm.fr> 
 and Adrien Josso Rigonato <adrien.josso-rigonato@genomecad.fr>.
 Expression of the need and test data were created by Cécile Meslier.
 
 The project is supported by `Collecteur Analyseur de Données (CAD)`.
-
 
 ## License
 

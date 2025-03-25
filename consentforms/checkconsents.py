@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 __authors__ = ("David Salgado", "Adrien Josso Rigonato")
-__contact__ = ("david.salgado@genomecad.fr", "adrien.josso-rigonato@genomecad.fr")
+__contact__ = ("david.salgado@inserm.fr", "adrien.josso-rigonato@genomecad.fr")
 __copyright__ = "GNU AGLP3"
 __version__ = "1.1.0"
 __prog_name__ = "CheckConsents"
