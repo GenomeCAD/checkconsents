@@ -305,15 +305,17 @@ def main(cli_args):
                 logger.debug(f"pdf: {path.basename(pf)}")
                 logger.info("Convert pdf to png")
                 img_file_path = Path(path.join(tmpdirname, f"{file_name}.png"))
-                exit_code = images.convert_pdf_2_png(Path(pf),
-                                                     DirectoryPath(tmpdirname),
-                                                     images.default_convert_output_format(file_name),
-                                                     config.conversion.density,
-                                                     config.conversion.opt_args)
-                if exit_code != 0:
-                    msg = f"Error during pdf conversion: {pf}"
-                    logger.error(msg)
-                    errors_pdf_convert.append(msg)
+                try:
+                    exit_code = images.convert_pdf_2_png(Path(pf),
+                                                        DirectoryPath(tmpdirname),
+                                                        images.default_convert_output_format(file_name),
+                                                        config.conversion.density,
+                                                        config.conversion.opt_args)
+                except images.PdfConvertError as pce:
+                    #msg = f"Error during pdf conversion: {pf}"
+                    logger.error(pce.msg)
+                    errors_pdf_convert.append(pce.msg)
+                    continue
 
                 logger.info("detect orientation - generate corrected image")
 

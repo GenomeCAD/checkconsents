@@ -50,7 +50,7 @@ def convert_pdf_2_png(pdf_filepath: FilePath,
     exec_cmd = ' '.join(cmd)
     exit_code = system(exec_cmd)
     if exit_code != 0:
-        raise PdfConvertError(f"Conversion of {pdf_filepath.resolve()} failed, command: {exec_cmd}")
+        raise PdfConvertError(f"Conversion of {pdf_filepath.resolve()} failed, command: {exec_cmd}, exit_code: {exit_code}")
     return exit_code
     # stream = os.popen(f"convert -density {density} {pdf_filepath.resolve()} {png_filepath.resolve()}")
     # return stream.read()
