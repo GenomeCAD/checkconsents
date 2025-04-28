@@ -21,6 +21,7 @@ from os import popen, path, remove
 from prettyprinter import pformat
 from pydantic import BaseModel, ConfigDict, DirectoryPath, FilePath, ValidationError, computed_field, conint, \
     field_validator
+from pytesseract import TesseractError 
 import shutil
 from typing import Dict, List, Optional
 import yaml
@@ -288,6 +289,7 @@ def main(cli_args):
 
     try:
         errors_pdf_convert: List[str] = []
+        errors_img_analysis: List[str] = []
         errors_omr: List[str] = []
 
         consents: List[Consent] = []
@@ -322,12 +324,17 @@ def main(cli_args):
 
                 for img in glob(path.join(tmpdirname, f"{file_name}{images.CONVERT_PAGE_SEPARATOR}*.png")):
                     img_path = Path(img)
-                    img_corrected_path = image_correction(img_path)
-                    img_cropped_path = crop_image(img_corrected_path)
-                    svg_template_filepath = get_template(img_cropped_path,
-                                                         config.pages,
-                                                         config.templates,
-                                                         config.parsing_header_limit)
+                    try:
+                        img_corrected_path = image_correction(img_path)
+                        img_cropped_path = crop_image(img_corrected_path)
+                        svg_template_filepath = get_template(img_cropped_path,
+                                                            config.pages,
+                                                            config.templates,
+                                                            config.parsing_header_limit)
+                    except TesseractError as te:
+                        logger.error(te)
+                        errors_img_analysis.append(te)
+                        continue
                     logger.debug(popen(f"ls -la {tmpdirname}").read())
                     if svg_template_filepath is None:
                         logger.debug(f"{img_path} - no template")
@@ -355,11 +362,14 @@ def main(cli_args):
             json.dump([c.model_dump(mode='json') for c in consents], f, indent=indent)
         logger.debug(popen(f"ls -lah {output_dir_path}").read())
 
-        if len(errors_pdf_convert) != 0 or len(errors_omr) != 0:
+        if len(errors_pdf_convert) != 0 or len(errors_img_analysis) != 0 or len(errors_omr) != 0:
             logger.warning("Some error have been raised during the execution refer to log for further details")
         if len(errors_pdf_convert) != 0:
             msg = ', '.join(errors_pdf_convert)
             raise images.PdfConvertError(msg)
+        if len(errors_img_analysis) != 0 :
+            msg = ', '.join(errors_img_analysis)
+            raise Exception(msg)
         if len(errors_omr) != 0:
             msg = ', '.join(errors_omr)
             raise OmrError(msg)
