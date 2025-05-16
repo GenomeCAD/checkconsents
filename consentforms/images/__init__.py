@@ -5,7 +5,7 @@
 __authors__ = ("David Salgado", "Adrien Josso Rigonato")
 __contact__ = ("david.salgado@genomecad.fr", "adrien.josso-rigonato@genomecad.fr")
 __copyright__ = "GNU AGLP3"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 
 import cv2
