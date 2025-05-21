@@ -19,6 +19,9 @@ from difflib import SequenceMatcher
 
 LOGGER = logging.getLogger(__name__)
 
+class FindTemplateError(Exception):
+    def __init__(self, message: str):
+        super().__init__(message)
 
 class Template(BaseModel):
     path: FilePath
@@ -39,7 +42,11 @@ def find_best_template(img: Path,
         lines = pytesseract.image_to_string(Image.open(img.resolve())).splitlines()
         LOGGER.debug("ocr done")
         LOGGER.debug(pages)
-        for i in range(parsing_header_limit):
+        if not lines or len(lines) == 0:
+            msg = f"ocr process does not return any lines, the image ({img.resolve()}) can't be processed to find a template. Skipping..."
+            LOGGER.error(msg)
+            raise FindTemplateError(msg)
+        for i in range(min(len(lines), parsing_header_limit)):
             for key in pages:
                 LOGGER.debug(pages[key])
                 simil_score = SequenceMatcher(None, lines[i], pages[key]).ratio()
@@ -48,7 +55,7 @@ def find_best_template(img: Path,
                     break
         LOGGER.debug(f"found_line: {found_line}")
         if found_line:
-            for i in range(parsing_header_limit):
+            for i in range(min(len(lines), parsing_header_limit)):
                 for key in templates:
                     simil_score = SequenceMatcher(None, lines[i], templates[key].pattern).ratio()
                     if simil_score > 0.90:
