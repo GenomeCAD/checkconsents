@@ -332,8 +332,9 @@ def main(cli_args):
                                                             config.templates,
                                                             config.parsing_header_limit)
                     except TesseractError as te:
-                        logger.error(te)
-                        errors_img_analysis.append(te)
+                        msg = f"({img}) " + te
+                        logger.error(msg)
+                        errors_img_analysis.append(msg)
                         continue
                     except templates.FindTemplateError as fte:
                         logger.error(te)
