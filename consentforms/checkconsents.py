@@ -337,8 +337,8 @@ def main(cli_args):
                         errors_img_analysis.append(msg)
                         continue
                     except templates.FindTemplateError as fte:
-                        logger.error(te)
-                        errors_img_analysis.append(te)
+                        logger.error(fte)
+                        errors_img_analysis.append(fte)
                         continue
                     logger.debug(popen(f"ls -la {tmpdirname}").read())
                     if svg_template_filepath is None:
