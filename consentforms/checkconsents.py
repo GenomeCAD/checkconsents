@@ -3,7 +3,7 @@
 __authors__ = ("David Salgado", "Adrien Josso Rigonato")
 __contact__ = ("david.salgado@inserm.fr", "adrien.josso-rigonato@genomecad.fr")
 __copyright__ = "GNU AGLP3"
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 __prog_name__ = "CheckConsents"
 
 import argparse
@@ -332,7 +332,7 @@ def main(cli_args):
                                                             config.templates,
                                                             config.parsing_header_limit)
                     except TesseractError as te:
-                        msg = f"({img}) " + te
+                        msg = f"({img}) {te}"
                         logger.error(msg)
                         errors_img_analysis.append(msg)
                         continue
