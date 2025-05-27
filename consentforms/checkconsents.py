@@ -291,6 +291,7 @@ def main(cli_args):
         errors_pdf_convert: List[str] = []
         errors_img_analysis: List[str] = []
         errors_omr: List[str] = []
+        errors_unexpected: List[str] = []
 
         consents: List[Consent] = []
         output_dir_path = DirectoryPath(path.join(cli_args.working_dir, f"{__prog_name__}_{exec_time}"))
@@ -302,64 +303,69 @@ def main(cli_args):
             logger.info(f"Working directory: {tmpdirname}")
             # TODO parallel tasks / subprocess / thread
             for pf in glob(path.join(input_dir.resolve(), "*.pdf")):
-                file_name, _ = path.splitext(path.basename(pf))
-                logger.debug(f"pdf: {pf}")
-                logger.debug(f"pdf: {path.basename(pf)}")
-                logger.info("Convert pdf to png")
-                img_file_path = Path(path.join(tmpdirname, f"{file_name}.png"))
                 try:
-                    images.convert_pdf_2_png(Path(pf),
-                                             DirectoryPath(tmpdirname),
-                                             images.default_convert_output_format(file_name),
-                                             config.conversion.density,
-                                             config.conversion.opt_args)
-                except images.PdfConvertError as pce:
-                    logger.error(pce)
-                    errors_pdf_convert.append(pce)
-                    continue
-
-                logger.info("detect orientation - generate corrected image")
-
-                logger.debug(popen(f"ls -la {tmpdirname}").read())
-
-                for img in glob(path.join(tmpdirname, f"{file_name}{images.CONVERT_PAGE_SEPARATOR}*.png")):
-                    img_path = Path(img)
+                    file_name, _ = path.splitext(path.basename(pf))
+                    logger.debug(f"pdf: {pf}")
+                    logger.debug(f"pdf: {path.basename(pf)}")
+                    logger.info("Convert pdf to png")
+                    img_file_path = Path(path.join(tmpdirname, f"{file_name}.png"))
                     try:
-                        img_corrected_path = image_correction(img_path)
-                        img_cropped_path = crop_image(img_corrected_path)
-                        svg_template_filepath = get_template(img_cropped_path,
-                                                            config.pages,
-                                                            config.templates,
-                                                            config.parsing_header_limit)
-                    except TesseractError as te:
-                        msg = f"({img}) {te}"
-                        logger.error(msg)
-                        errors_img_analysis.append(msg)
+                        images.convert_pdf_2_png(Path(pf),
+                                                DirectoryPath(tmpdirname),
+                                                images.default_convert_output_format(file_name),
+                                                config.conversion.density,
+                                                config.conversion.opt_args)
+                    except images.PdfConvertError as pce:
+                        logger.error(pce)
+                        errors_pdf_convert.append(pce)
                         continue
-                    except templates.FindTemplateError as fte:
-                        logger.error(fte)
-                        errors_img_analysis.append(fte)
-                        continue
+
+                    logger.info("detect orientation - generate corrected image")
+
                     logger.debug(popen(f"ls -la {tmpdirname}").read())
-                    if svg_template_filepath is None:
-                        logger.debug(f"{img_path} - no template")
-                        continue
-                    try:
-                        svg_template_path = Path(svg_template_filepath)
-                        res, image, clean, marks = optical_mark_reco(img_cropped_path, svg_template_path)
-                        logger.info(f"OMR results ({img_path}): {res}")
-                        consent = Consent(pdf_filepath=FilePath(pf), omr_res=res)
-                        if consent.consent == UNDERTERMINED or logger.isEnabledFor(logging.DEBUG):
-                            img_cropped_filename, _ = path.splitext(path.basename(img_cropped_path.resolve()))
-                            debug_image_filepath = path.join(output_dir_path, f"{img_cropped_filename}-omr-debug.png")
-                            create_debug_image(debug_image_filepath, image, clean, marks, res)
-                            consent.debug_img_filepath = FilePath(debug_image_filepath)
-                        consents.append(consent)
-                    except omr.OmrTemplateError as e:
-                        logger.error(e)
-                        msg = f"Error during OMR: {img_cropped_path.resolve()}[{e}]"
-                        logger.error(msg)
-                        errors_omr.append(msg)
+
+                    for img in glob(path.join(tmpdirname, f"{file_name}{images.CONVERT_PAGE_SEPARATOR}*.png")):
+                        img_path = Path(img)
+                        try:
+                            img_corrected_path = image_correction(img_path)
+                            img_cropped_path = crop_image(img_corrected_path)
+                            svg_template_filepath = get_template(img_cropped_path,
+                                                                config.pages,
+                                                                config.templates,
+                                                                config.parsing_header_limit)
+                        except TesseractError as te:
+                            msg = f"({img}) {te}"
+                            logger.error(msg)
+                            errors_img_analysis.append(msg)
+                            continue
+                        except templates.FindTemplateError as fte:
+                            logger.error(fte)
+                            errors_img_analysis.append(fte)
+                            continue
+                        logger.debug(popen(f"ls -la {tmpdirname}").read())
+                        if svg_template_filepath is None:
+                            logger.debug(f"{img_path} - no template")
+                            continue
+                        try:
+                            svg_template_path = Path(svg_template_filepath)
+                            res, image, clean, marks = optical_mark_reco(img_cropped_path, svg_template_path)
+                            logger.info(f"OMR results ({img_path}): {res}")
+                            consent = Consent(pdf_filepath=FilePath(pf), omr_res=res)
+                            if consent.consent == UNDERTERMINED or logger.isEnabledFor(logging.DEBUG):
+                                img_cropped_filename, _ = path.splitext(path.basename(img_cropped_path.resolve()))
+                                debug_image_filepath = path.join(output_dir_path, f"{img_cropped_filename}-omr-debug.png")
+                                create_debug_image(debug_image_filepath, image, clean, marks, res)
+                                consent.debug_img_filepath = FilePath(debug_image_filepath)
+                            consents.append(consent)
+                        except omr.OmrTemplateError as e:
+                            logger.error(e)
+                            msg = f"Error during OMR: {img_cropped_path.resolve()}[{e}]"
+                            logger.error(msg)
+                            errors_omr.append(msg)
+                except Exception as e:
+                    msg = f"Processing {pf} failed: [{e}]"
+                    logger.error(msg)
+                    errors_unexpected.append(msg)
         logger.info("Final results:")
         logger.info(pformat(consents))
         indent = 4 if logger.isEnabledFor(logging.DEBUG) else None
@@ -367,7 +373,7 @@ def main(cli_args):
             json.dump([c.model_dump(mode='json') for c in consents], f, indent=indent)
         logger.debug(popen(f"ls -lah {output_dir_path}").read())
 
-        if len(errors_pdf_convert) != 0 or len(errors_img_analysis) != 0 or len(errors_omr) != 0:
+        if len(errors_pdf_convert) != 0 or len(errors_img_analysis) != 0 or len(errors_omr) != 0 or len(errors_unexpected) != 0:
             logger.warning("Some error have been raised during the execution refer to log for further details")
         if len(errors_pdf_convert) != 0:
             msg = ', '.join(errors_pdf_convert)
@@ -378,6 +384,9 @@ def main(cli_args):
         if len(errors_omr) != 0:
             msg = ', '.join(errors_omr)
             raise OmrError(msg)
+        if len(errors_unexpected) != 0:
+            msg = ', '.join(errors_unexpected)
+            raise Exception(msg)
 
     except images.PdfConvertError as e:
         logger.error(e)
