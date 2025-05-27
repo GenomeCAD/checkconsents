@@ -3,7 +3,7 @@
 __authors__ = ("David Salgado", "Adrien Josso Rigonato")
 __contact__ = ("david.salgado@inserm.fr", "adrien.josso-rigonato@genomecad.fr")
 __copyright__ = "GNU AGLP3"
-__version__ = "1.3.2"
+__version__ = "1.3.3"
 __prog_name__ = "CheckConsents"
 
 import argparse
